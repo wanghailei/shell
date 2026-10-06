@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shell example</title>
+<!-- The layer order comes before shell.css: a layer ranks by where it is first named, and a reset named after shell would undo Shell's insets. -->
+<style>@layer reset, shell, page;</style>
+<link rel="stylesheet" href="shell.css">
+<script type="importmap">{ "imports": { "shell": "./shell.js" } }</script>
+<style>
+
+	@font-face {
+		font-family: "Berkeley Mono Variable";
+		src: url("file:///Users/Hailei/Library/Fonts/Berkeley%20Mono%20Variable.otf") format("opentype");
+	}
+
+	@layer reset {
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+	}
+
+	@layer page {
+		:root {
+			color-scheme: light dark;
+			--background: light-dark(#ffffff, #111111);
+			--column: light-dark(#f7f7f7, #151515);
+			--text: light-dark(#262626, #cfcfcf);
+			--quiet: light-dark(#8c8c8c, #808080);
+			--base-border: solid 1px light-dark(#e6e6e6, #262626);
+		}
+
+		body { background: var(--background); color: var(--text); font: 13px/1.6 "Berkeley Mono Variable", "Berkeley Mono", ui-monospace, monospace; overflow: hidden; }
+		#menu, #side, #more { background: var(--column); }
+		.title { font-weight: 600; }
+		.head > *, .neck > *, .foot > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		.neck, .foot { color: var(--quiet); }
+		.body p { margin-block: 1em; max-width: 72ch; }
+		button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; width: var(--base-space); height: var(--base-space); }
+		button:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
+		.body button { width: auto; height: auto; padding: 4px 10px; margin: 0 6px 6px 0; border: var(--base-border); }
+	}
+</style>
+</head>
+<body>
+
+<div id="shell" class="show-menu-main">
+
+	<nav id="menu">
+		<div class="head"><span></span><span class="title">Menu</span><span></span></div>
+		<div class="neck"><span></span><span>The menu column</span><span></span></div>
+		<div class="body"><p>A list of places would go here. This body scrolls on its own.</p></div>
+		<div class="foot"><span></span><span>Menu foot</span><span></span></div>
+	</nav>
+
+	<main id="main">
+		<div class="head"><button data-change="toggleMenu" title="Show or hide the menu">☰</button><span class="title">Shell example</span><button data-change="showMore" title="Show more">⋯</button></div>
+		<div class="neck"><span></span><span>Only a body scrolls</span><span></span></div>
+		<div class="body">
+			<p>Each column has a head, a neck, a body and a foot. Every title and every paragraph sits one base space in from its column's edges. In a head, the icon cells beside the title make that space.</p>
+			<p>
+				<button data-change="toggleMenu">toggleMenu</button>
+				<button data-change="showSide">showSide</button>
+				<button data-change="hideSide">hideSide</button>
+				<button data-change="showMore">showMore</button>
+				<button data-change="hideMore">hideMore</button>
+			</p>
+			<p id="layout"></p>
+		</div>
+		<div class="foot"><span></span><span>Main foot</span><span></span></div>
+	</main>
+
+	<aside id="side">
+		<div class="head"><span></span><span class="title">Side</span><button data-change="hideSide" title="Close side">✕</button></div>
+		<div class="neck"><span></span><span>A record opened from main</span><span></span></div>
+		<div class="body"><p>Side shows next to main. Opening more beside it keeps it open; showing a new side closes more.</p></div>
+		<div class="foot"><span></span><span>Side foot</span><span></span></div>
+	</aside>
+
+	<aside id="more">
+		<div class="head"><span></span><span class="title">More</span><button data-change="hideMore" title="Close more">✕</button></div>
+		<div class="neck"><span></span><span>More about the side record</span><span></span></div>
+		<div class="body"><p>More only shows with side.</p></div>
+		<div class="foot"><span></span><span>More foot</span><span></span></div>
+	</aside>
+
+</div>
+
+<script type="module">
+	import * as shell from "shell"
+
+	const element = document.getElementById( "shell" )
+	const layout = document.getElementById( "layout" )
+
+	// This page's own wiring: a button names the change it makes in data-change.
+	for( const button of document.querySelectorAll( "[data-change]" ) ) {
+		button.addEventListener( "click", () => {
+			shell[ button.dataset.change ]( element )
+			showLayout()
+		} )
+	}
+
+	function showLayout() {
+		layout.textContent = `#shell has the class ${ element.className }.`
+	}
+
+	// Enough text for the main body to scroll.
+	const body = element.querySelector( "#main .body" )
+	for( let number = 1; number <= 40; number++ ) {
+		body.insertAdjacentHTML( "beforeend", `<p>Paragraph ${ number }. Scroll this body: the head, neck and foot stay where they are.</p>` )
+	}
+	showLayout()
+</script>
+</body>
+</html>

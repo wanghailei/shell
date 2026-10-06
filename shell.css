@@ -1,0 +1,121 @@
+/* Shell 0.1.0 · github.com/wanghailei/shell */
+
+/* An application's frame: up to four columns, menu | main | side | more, each in four rows, head | neck | body | foot.
+	Only a body scrolls. Which columns show is one layout class on #shell; shell.js changes it.
+	Everything is in @layer shell. The page declares its layer order once, with any reset before shell:
+		@layer reset, shell; */
+
+@layer shell {
+
+	/* ---- Defaults ----------------------------------------------------------------------------
+		Shell reads two of the page's own tokens and falls back where the page has none:
+			--base-space    40px                 the row height, an icon cell, and the inset
+			--base-border   solid 1px #eaeaea
+		They are the page's to declare, so Shell never declares them. Its own three widths it declares here;
+		a page sets its own in :root, unlayered or in a layer after shell, since a layer before shell loses to these. */
+
+	:root {
+		--shell-menu-width: 240px;
+		--shell-main-width: minmax(240px, 1fr);
+		--shell-side-more-width: clamp(450px, 33%, 800px);    /* side and more, when both show */
+	}
+
+	/* ---- The grid and its six layouts ------------------------------------------------------
+		Every layout has four tracks, one per column, and hides a column with 0px. The same number of tracks
+		lets grid-template-columns slide from one layout to the next. */
+
+	#shell {
+		display: grid;
+		grid-template-rows: var(--base-space, 40px) var(--base-space, 40px) 1fr var(--base-space, 40px);
+		position: fixed;      /* fills the window whatever the page's margins, and gives the page nothing to scroll */
+		inset: 0px;
+		transition: grid-template-columns 0.2s ease;
+	}
+
+	/* | main | */
+	#shell.show-main {
+		grid-template-columns: 0px var(--shell-main-width) 0px 0px;
+	}
+
+	/* | menu | main | */
+	#shell.show-menu-main {
+		grid-template-columns: var(--shell-menu-width) var(--shell-main-width) 0px 0px;
+	}
+
+	/* | main | side | : side takes half, up to 864px */
+	#shell.show-main-side {
+		grid-template-columns: 0px var(--shell-main-width) clamp(0px, 50%, 864px) 0px;
+	}
+
+	/* | menu | main | side | : side takes half of what the menu leaves, up to 864px */
+	#shell.show-menu-main-side {
+		grid-template-columns: var(--shell-menu-width) var(--shell-main-width) clamp(0px, calc((100% - var(--shell-menu-width)) / 2), 864px) 0px;
+	}
+
+	/* | main | side | more | */
+	#shell.show-main-side-more {
+		grid-template-columns: 0px var(--shell-main-width) var(--shell-side-more-width) var(--shell-side-more-width);
+	}
+
+	/* | menu | main | side | more | */
+	#shell.show-menu-main-side-more {
+		grid-template-columns: var(--shell-menu-width) var(--shell-main-width) var(--shell-side-more-width) var(--shell-side-more-width);
+	}
+
+	/* ---- Columns ---------------------------------------------------------------------------
+		Each column has its own track, so a page may leave out any column it does not use.
+		Its rows are the shell's rows (subgrid), and it clips what it holds: these are the walls that let a
+		column slide shut and keep only the body scrolling. Anything that must float over a wall, such as a menu
+		or a popover, belongs in the top layer (<div popover>), which no overflow clips. */
+
+	#menu,
+	#main,
+	#side,
+	#more {
+		display: grid;
+		grid-template-rows: subgrid;
+		grid-row: 1 / -1;
+		min-width: 0px;       /* lets a column shrink below its content's width, down to 0px */
+		overflow: hidden;
+		transition: visibility 0.2s;      /* stays visible while it slides shut, then hides */
+	}
+
+	/* A column the layout hides is hidden from the keyboard and from screen readers too, not only squeezed to 0px. */
+	#shell:is(.show-main, .show-main-side, .show-main-side-more) #menu,
+	#shell:is(.show-main, .show-menu-main) #side,
+	#shell:is(.show-main, .show-menu-main, .show-main-side, .show-menu-main-side) #more {
+		visibility: hidden;
+	}
+
+	#menu { grid-column: 1; border-right: var(--base-border, solid 1px #eaeaea); }
+	#main { grid-column: 2; }
+	#side { grid-column: 3; border-left: var(--base-border, solid 1px #eaeaea); }
+	#more { grid-column: 4; border-left: var(--base-border, solid 1px #eaeaea); }
+
+	/* ---- Rows ------------------------------------------------------------------------------
+		A head, neck or foot is three cells: an icon cell, the title, an icon cell. A title therefore sits
+		one base space in from each edge of its column. A bar that needs more cells sets its own
+		grid-template-columns in a layer after shell. */
+
+	.head,
+	.neck,
+	.foot {
+		display: grid;
+		grid-template-columns: var(--base-space, 40px) minmax(0px, 1fr) var(--base-space, 40px);
+		align-items: center;
+		overflow: hidden;
+	}
+
+	.head { grid-row: 1; border-bottom: var(--base-border, solid 1px #eaeaea); }
+	.neck { grid-row: 2; }
+	.foot { grid-row: 4; border-top: var(--base-border, solid 1px #eaeaea); }
+
+	/* The body alone scrolls, and its content sits one base space in from each edge. */
+	.body {
+		grid-row: 3;
+		min-height: 0px;      /* lets the row shrink to the space left, so the body scrolls instead of growing */
+		overflow-x: hidden;
+		overflow-y: auto;
+		padding-inline: var(--base-space, 40px);
+	}
+}

@@ -1,0 +1,13 @@
+{
+	"name": "shell",
+	"private": true,
+	"type": "module",
+	"description": "Development only: Shell ships shell.css and shell.js, and nothing here is installed by an app.",
+	"scripts": {
+		"test": "node --test --experimental-test-coverage --test-coverage-include=shell.js --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 test/*.test.js",
+		"test:browser": "playwright test"
+	},
+	"devDependencies": {
+		"@playwright/test": "1.63.0"
+	}
+}
