@@ -101,7 +101,7 @@ Every colour is a Carbon token. Where the page has Carbon's own tokens, such as 
 
 Shell keeps them as `--shell-background`, `--shell-text`, `--shell-quiet`, `--shell-icon`, `--shell-icon-hover`, `--shell-hover`, `--shell-accent`, `--shell-focus`, `--shell-menu-background` and `--shell-edge` on `#shell`, for the page's own rules to use.
 
-The type is 13px on 1.6, in `"Berkeley Mono Variable", "IBM Plex Mono", monospace` (`--shell-font`). Shell loads no font: the page declares the `@font-face` for the one it has.
+The type is 13px on 1.6, in `"Berkeley Mono Variable", "IBM Plex Mono", monospace` (`--shell-font`). Shell loads no font. Where one of them is installed, the browser finds it by name; a page that serves its own font file declares an `@font-face` for it.
 
 ## The JavaScript
 
@@ -154,8 +154,9 @@ export default class extends Controller {
 Read both files at the tag and inline them: the CSS in a `<style>` after `@layer reset, shell;`, and the JavaScript, as it is, at the top of a `<script type="module">`, where the five functions are then in scope by name. A page opened from disk (`file://`) cannot import module files, but it runs inline module scripts.
 
 ```sh
-git -C ~/Dev/shell show v0.1.0:shell.css
-git -C ~/Dev/shell show v0.1.0:shell.js
+git clone https://github.com/wanghailei/shell.git && cd shell
+git show v0.1.0:shell.css
+git show v0.1.0:shell.js
 ```
 
 ### Any other page
@@ -173,10 +174,10 @@ Serve the two files with the page, or load them from jsDelivr at a tag, with int
 </script>
 ```
 
-Each hash is the file's at that tag:
+Each hash is the file's at that tag. In a clone of the repository:
 
 ```sh
-git -C ~/Dev/shell show v0.1.0:shell.css | openssl dgst -sha384 -binary | openssl base64 -A
+git show v0.1.0:shell.css | openssl dgst -sha384 -binary | openssl base64 -A
 ```
 
 ## Working on it
