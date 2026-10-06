@@ -20,24 +20,19 @@
 	}
 
 	@layer page {
-		:root {
-			color-scheme: light dark;
-			--background: light-dark(#ffffff, #111111);
-			--column: light-dark(#f7f7f7, #151515);
-			--text: light-dark(#262626, #cfcfcf);
-			--quiet: light-dark(#8c8c8c, #808080);
-			--base-border: solid 1px light-dark(#e6e6e6, #262626);
-		}
+		:root { color-scheme: light dark; }
 
-		body { background: var(--background); color: var(--text); font: 13px/1.6 "Berkeley Mono Variable", "Berkeley Mono", ui-monospace, monospace; overflow: hidden; }
-		#menu, #side, #more { background: var(--column); }
-		.title { font-weight: 600; }
-		.head > *, .neck > *, .foot > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-		.neck, .foot { color: var(--quiet); }
+		.brand b { letter-spacing: 2px; }
+		.brand span { margin-left: 10px; color: var(--shell-quiet); }
+
 		.body p { margin-block: 1em; max-width: 72ch; }
-		button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; width: var(--base-space); height: var(--base-space); }
-		button:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
-		.body button { width: auto; height: auto; padding: 4px 10px; margin: 0 6px 6px 0; border: var(--base-border); }
+		.body ul { list-style: none; margin-block: 1em; }
+		.body li button { width: 100%; padding: 4px 0px; text-align: left; border: none; color: var(--shell-quiet); }
+		.body li button:hover { background: none; color: var(--shell-text); }
+		.body li button[aria-current] { color: var(--shell-accent); }
+
+		.body button { font: inherit; color: inherit; background: none; cursor: pointer; padding: 4px 10px; margin: 0px 6px 6px 0px; border: solid 1px var(--shell-edge); }
+		.body button:hover { background: var(--shell-hover); }
 	}
 </style>
 </head>
@@ -46,15 +41,28 @@
 <div id="shell" class="show-menu-main">
 
 	<nav id="menu">
-		<div class="head"><span></span><span class="title">Menu</span><span></span></div>
-		<div class="neck"><span></span><span>The menu column</span><span></span></div>
-		<div class="body"><p>A list of places would go here. This body scrolls on its own.</p></div>
-		<div class="foot"><span></span><span>Menu foot</span><span></span></div>
+		<div class="head">
+			<span class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M24 4h2v24h-2zm-6 2v20h-4V6h4m0-2h-4a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM6 4h2v24H6z"/></svg></span>
+			<span class="brand"><b>SHELL</b><span>0.1.0</span></span>
+			<span></span>
+		</div>
+		<div class="neck"><span></span><span>LAYOUTS</span><span></span></div>
+		<div class="body"><ul id="layouts"></ul></div>
+		<div class="foot">
+			<button class="icon-button" id="scheme" title="Light or dark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M15 2h2v5h-2zM21.688 8.9l3.506-3.506 1.414 1.414-3.506 3.506zM25 15h5v2h-5zM21.688 23.1l1.414-1.413 3.506 3.506-1.414 1.414zM15 25h2v5h-2zM5.394 25.192 8.9 21.686l1.414 1.414-3.505 3.506zM2 15h5v2H2zM5.395 6.808l1.414-1.414L10.315 8.9 8.9 10.314zM16 12a4 4 0 1 1-4 4 4.005 4.005 0 0 1 4-4m0-2a6 6 0 1 0 6 6 6 6 0 0 0-6-6Z"/></svg></button>
+			<span id="scheme-name"></span>
+			<span></span>
+		</div>
 	</nav>
 
 	<main id="main">
-		<div class="head"><button data-change="toggleMenu" title="Show or hide the menu">☰</button><span class="title">Shell example</span><button data-change="showMore" title="Show more">⋯</button></div>
-		<div class="neck"><span></span><span>Only a body scrolls</span><span></span></div>
+		<div class="head">
+			<button class="icon-button" data-change="toggleMenu" title="Show or hide the menu"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 6h24v2H4zm0 18h24v2H4zm0-12h24v2H4zm0 6h24v2H4z"/></svg></button>
+			<span class="title">Shell example</span>
+			<button class="icon-button" id="previous" title="Previous layout"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M10 16 20 6l1.4 1.4-8.6 8.6 8.6 8.6L20 26z"/></svg></button>
+			<button class="icon-button" id="next" title="Next layout"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M22 16 12 26l-1.4-1.4 8.6-8.6-8.6-8.6L12 6z"/></svg></button>
+		</div>
+		<div class="neck"><span></span><span id="position"></span><span></span></div>
 		<div class="body">
 			<p>Each column has a head, a neck, a body and a foot. Every title and every paragraph sits one base space in from its column's edges. In a head, the icon cells beside the title make that space.</p>
 			<p>
@@ -66,18 +74,26 @@
 			</p>
 			<p id="layout"></p>
 		</div>
-		<div class="foot"><span></span><span>Main foot</span><span></span></div>
+		<div class="foot"><span></span><span>Only a body scrolls</span><span></span></div>
 	</main>
 
 	<aside id="side">
-		<div class="head"><span></span><span class="title">Side</span><button data-change="hideSide" title="Close side">✕</button></div>
+		<div class="head">
+			<span></span>
+			<span class="title">Side</span>
+			<button class="icon-button" data-change="hideSide" title="Close side"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M17.414 16 24 9.414 22.586 8 16 14.586 9.414 8 8 9.414 14.586 16 8 22.586 9.414 24 16 17.414 22.586 24 24 22.586 17.414 16z"/></svg></button>
+		</div>
 		<div class="neck"><span></span><span>A record opened from main</span><span></span></div>
 		<div class="body"><p>Side shows next to main. Opening more beside it keeps it open; showing a new side closes more.</p></div>
 		<div class="foot"><span></span><span>Side foot</span><span></span></div>
 	</aside>
 
 	<aside id="more">
-		<div class="head"><span></span><span class="title">More</span><button data-change="hideMore" title="Close more">✕</button></div>
+		<div class="head">
+			<span></span>
+			<span class="title">More</span>
+			<button class="icon-button" data-change="hideMore" title="Close more"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M17.414 16 24 9.414 22.586 8 16 14.586 9.414 8 8 9.414 14.586 16 8 22.586 9.414 24 16 17.414 22.586 24 24 22.586 17.414 16z"/></svg></button>
+		</div>
 		<div class="neck"><span></span><span>More about the side record</span><span></span></div>
 		<div class="body"><p>More only shows with side.</p></div>
 		<div class="foot"><span></span><span>More foot</span><span></span></div>
@@ -88,8 +104,10 @@
 <script type="module">
 	import * as shell from "shell"
 
+	const LAYOUTS = [ "show-main", "show-menu-main", "show-main-side", "show-menu-main-side", "show-main-side-more", "show-menu-main-side-more" ]
+
 	const element = document.getElementById( "shell" )
-	const layout = document.getElementById( "layout" )
+	const list = document.getElementById( "layouts" )
 
 	// This page's own wiring: a button names the change it makes in data-change.
 	for( const button of document.querySelectorAll( "[data-change]" ) ) {
@@ -99,8 +117,55 @@
 		} )
 	}
 
+	// The menu lists the six layouts by the columns they show, and the arrows in main's head step through them. A layout is a class on #shell.
+	for( const layout of LAYOUTS ) {
+		list.insertAdjacentHTML( "beforeend", `<li><button data-layout="${ layout }" title="${ layout }">${ layout.replace( "show-", "" ).replaceAll( "-", " " ) }</button></li>` )
+	}
+	list.addEventListener( "click", event => {
+		const button = event.target.closest( "[data-layout]" )
+		if( button ) useLayout( button.dataset.layout )
+	} )
+	document.getElementById( "previous" ).addEventListener( "click", () => step( -1 ) )
+	document.getElementById( "next" ).addEventListener( "click", () => step( 1 ) )
+
+	function step( by ) {
+		const index = LAYOUTS.indexOf( currentLayout() )
+		useLayout( LAYOUTS[ ( index + by + LAYOUTS.length ) % LAYOUTS.length ] )
+	}
+
+	function useLayout( layout ) {
+		element.classList.replace( currentLayout(), layout )
+		showLayout()
+	}
+
+	function currentLayout() {
+		return LAYOUTS.find( layout => element.classList.contains( layout ) )
+	}
+
 	function showLayout() {
-		layout.textContent = `#shell has the class ${ element.className }.`
+		const layout = currentLayout()
+		document.getElementById( "layout" ).textContent = `#shell has the class ${ layout }.`
+		document.getElementById( "position" ).textContent = `Layout ${ LAYOUTS.indexOf( layout ) + 1 } of ${ LAYOUTS.length }`
+		for( const button of list.querySelectorAll( "button" ) ) {
+			if( button.dataset.layout === layout ) button.setAttribute( "aria-current", "true" )
+			else button.removeAttribute( "aria-current" )
+		}
+	}
+
+	// The sun in the menu's foot turns the page from light to dark and back.
+	const root = document.documentElement
+	const schemeName = document.getElementById( "scheme-name" )
+	document.getElementById( "scheme" ).addEventListener( "click", () => {
+		root.style.colorScheme = isDark() ? "light" : "dark"
+		showScheme()
+	} )
+
+	function isDark() {
+		return ( root.style.colorScheme || ( matchMedia( "(prefers-color-scheme: dark)" ).matches ? "dark" : "light" ) ) === "dark"
+	}
+
+	function showScheme() {
+		schemeName.textContent = isDark() ? "Dark" : "Light"
 	}
 
 	// Enough text for the main body to scroll.
@@ -109,6 +174,7 @@
 		body.insertAdjacentHTML( "beforeend", `<p>Paragraph ${ number }. Scroll this body: the head, neck and foot stay where they are.</p>` )
 	}
 	showLayout()
+	showScheme()
 </script>
 </body>
 </html>

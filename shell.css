@@ -3,14 +3,15 @@
 /* An application's frame: up to four columns, menu | main | side | more, each in four rows, head | neck | body | foot.
 	Only a body scrolls. Which columns show is one layout class on #shell; shell.js changes it.
 	Everything is in @layer shell. The page declares its layer order once, with any reset before shell:
-		@layer reset, shell; */
+		@layer reset, shell;
+	Its colours, icons and type follow IBM's Carbon Design System. */
 
 @layer shell {
 
 	/* ---- Defaults ----------------------------------------------------------------------------
 		Shell reads two of the page's own tokens and falls back where the page has none:
-			--base-space    40px                 the row height, an icon cell, and the inset
-			--base-border   solid 1px #eaeaea
+			--base-space    40px                          the row height, an icon cell, and the inset
+			--base-border   solid 1px var(--shell-edge)   around the shell, between columns, under a head, over a foot
 		They are the page's to declare, so Shell never declares them. Its own three widths it declares here;
 		a page sets its own in :root, unlayered or in a layer after shell, since a layer before shell loses to these. */
 
@@ -29,6 +30,7 @@
 		grid-template-rows: var(--base-space, 40px) var(--base-space, 40px) 1fr var(--base-space, 40px);
 		position: fixed;      /* fills the window whatever the page's margins, and gives the page nothing to scroll */
 		inset: 0px;
+		border: var(--base-border, solid 1px var(--shell-edge));      /* the columns sit inside it */
 		transition: grid-template-columns 0.2s ease;
 	}
 
@@ -87,28 +89,38 @@
 		visibility: hidden;
 	}
 
-	#menu { grid-column: 1; border-right: var(--base-border, solid 1px #eaeaea); }
+	#menu { grid-column: 1; border-right: var(--base-border, solid 1px var(--shell-edge)); }
 	#main { grid-column: 2; }
-	#side { grid-column: 3; border-left: var(--base-border, solid 1px #eaeaea); }
-	#more { grid-column: 4; border-left: var(--base-border, solid 1px #eaeaea); }
+	#side { grid-column: 3; border-left: var(--base-border, solid 1px var(--shell-edge)); }
+	#more { grid-column: 4; border-left: var(--base-border, solid 1px var(--shell-edge)); }
 
 	/* ---- Rows ------------------------------------------------------------------------------
-		A head, neck or foot is three cells: an icon cell, the title, an icon cell. A title therefore sits
-		one base space in from each edge of its column. A bar that needs more cells sets its own
-		grid-template-columns in a layer after shell. */
+		A head, neck or foot is an icon cell, the title, then one icon cell for each element after the title.
+		With at least one element after it, empty if need be, a title sits one base space in from each edge of
+		its column. What does not fit its cell ends in an ellipsis. */
 
 	.head,
 	.neck,
 	.foot {
 		display: grid;
-		grid-template-columns: var(--base-space, 40px) minmax(0px, 1fr) var(--base-space, 40px);
+		grid-template-columns: var(--base-space, 40px) minmax(0px, 1fr);
+		grid-auto-flow: column;
+		grid-auto-columns: var(--base-space, 40px);
 		align-items: center;
 		overflow: hidden;
 	}
 
-	.head { grid-row: 1; border-bottom: var(--base-border, solid 1px #eaeaea); }
-	.neck { grid-row: 2; }
-	.foot { grid-row: 4; border-top: var(--base-border, solid 1px #eaeaea); }
+	.head > *,
+	.neck > *,
+	.foot > * {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.head { grid-row: 1; border-bottom: var(--base-border, solid 1px var(--shell-edge)); }
+	.neck { grid-row: 2; color: var(--shell-quiet); }
+	.foot { grid-row: 4; border-top: var(--base-border, solid 1px var(--shell-edge)); color: var(--shell-quiet); }
 
 	/* The body alone scrolls, and its content sits one base space in from each edge. */
 	.body {
@@ -117,5 +129,80 @@
 		overflow-x: hidden;
 		overflow-y: auto;
 		padding-inline: var(--base-space, 40px);
+	}
+
+	/* ---- The look --------------------------------------------------------------------------
+		Every colour is a Carbon token: the page's own where it has them, as a Carbon theme zone sets them, and
+		otherwise Carbon's value, from theme g10 in light and g100 in dark. Dark follows the page's color-scheme.
+		They are declared on #shell, not :root, so that a theme zone on #shell or around it reaches them. */
+
+	#shell {
+		--shell-background: var(--cds-background, light-dark(#f4f4f4, #161616));
+		--shell-hover: var(--cds-background-hover, light-dark(rgba(141, 141, 141, 0.12), rgba(141, 141, 141, 0.16)));
+		--shell-text: var(--cds-text-primary, light-dark(#161616, #f4f4f4));
+		--shell-quiet: var(--cds-text-secondary, light-dark(#525252, #c6c6c6));
+		--shell-icon: var(--cds-icon-secondary, light-dark(#525252, #c6c6c6));
+		--shell-icon-hover: var(--cds-icon-primary, light-dark(#161616, #f4f4f4));
+		--shell-accent: var(--cds-interactive, light-dark(#0f62fe, #4589ff));
+		--shell-focus: var(--cds-focus, light-dark(#0f62fe, #ffffff));
+		/* The menu is one shade from main: a fifth of the way to Carbon's first layer. */
+		--shell-menu-background: color-mix(in srgb, var(--shell-background) 80%, var(--cds-layer-01, light-dark(#ffffff, #262626)));
+		/* A border is three tenths of the way from the background to Carbon's subtlest border. */
+		--shell-edge: color-mix(in srgb, var(--shell-background) 70%, var(--cds-border-subtle-00, light-dark(#c6c6c6, #393939)));
+		--shell-font: "Berkeley Mono Variable", "IBM Plex Mono", monospace;
+
+		background: var(--shell-background);
+		color: var(--shell-text);
+		font: 13px/1.6 var(--shell-font);
+	}
+
+	#menu { background: var(--shell-menu-background); }
+
+	.title { font-weight: 600; }
+
+	/* An icon button fills its cell, as Carbon's ghost icon button does, and holds a 16px Carbon icon. Its icon is
+		Carbon's secondary icon colour at rest and its primary one under the pointer, a step quieter than Carbon's own. */
+	.icon-button {
+		display: grid;
+		place-items: center;
+		width: var(--base-space, 40px);
+		height: var(--base-space, 40px);
+		padding: 0px;
+		border: none;
+		background: none;
+		color: var(--shell-icon);
+		cursor: pointer;
+	}
+
+	.icon-button:hover {
+		background: var(--shell-hover);
+		color: var(--shell-icon-hover);
+	}
+
+	.icon-button:focus-visible {
+		outline: 2px solid var(--shell-focus);
+		outline-offset: -2px;
+	}
+
+	.icon-button:disabled {
+		background: none;
+		color: var(--cds-icon-disabled, light-dark(rgba(22, 22, 22, 0.25), rgba(244, 244, 244, 0.25)));
+		cursor: not-allowed;
+	}
+
+	/* The first cell of the menu's head holds the app's own icon. */
+	.logo {
+		display: grid;
+		place-items: center;
+		width: var(--base-space, 40px);
+		height: var(--base-space, 40px);
+		color: var(--shell-accent);
+	}
+
+	.icon-button svg,
+	.logo svg {
+		width: 16px;
+		height: 16px;
+		fill: currentColor;
 	}
 }

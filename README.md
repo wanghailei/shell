@@ -2,7 +2,7 @@
 
 An application's frame for the web, in one CSS file and one small JavaScript module. Up to four columns, **menu | main | side | more**, each in four rows, **head | neck | body | foot**. Only a body scrolls. Which columns show is one layout class on `#shell`, and the columns slide when it changes.
 
-Shell was distilled from the frame of Nexus, a Rails app. It needs no framework and no build step: copy `shell.css` and `shell.js` into your app.
+Shell was distilled from the frame of Nexus, a Rails app. Its colours, icons and type follow IBM's [Carbon Design System](https://carbondesignsystem.com). It needs no framework and no build step: copy `shell.css` and `shell.js` into your app.
 
 ## The markup
 
@@ -22,7 +22,23 @@ Shell was distilled from the frame of Nexus, a Rails app. It needs no framework 
 
 `#shell` fills the window, and the page around it does not scroll. Leave out any column you do not use. `example.html` is the whole of it as a working page; serve it over http, for example with `python3 -m http.server`, since a browser does not import modules from `file://`.
 
-A head, neck or foot has three cells: an icon cell, the title, an icon cell. That puts every title one base space in from its column's edges, and a body's content sits the same distance in. A bar that needs more cells sets its own `grid-template-columns`.
+A head, neck or foot is an icon cell, the title, then one icon cell for each element after the title. Give a bar at least one element after its title, an empty `<span></span>` if need be: then every title sits one base space in from its column's edges, and a body's content sits the same distance in. Text that does not fit its cell ends in an ellipsis.
+
+```html
+<div class="head">
+	<span class="logo"><svg viewBox="0 0 32 32">…</svg></span>   <!-- the menu's first cell: the app's icon -->
+	<span class="title">Orders</span>
+	<span></span>
+</div>
+<div class="head">
+	<button class="icon-button" title="Show or hide the menu"><svg viewBox="0 0 32 32">…</svg></button>
+	<span class="title">Order 1042</span>
+	<button class="icon-button" title="Back"><svg viewBox="0 0 32 32">…</svg></button>
+	<button class="icon-button" title="Forward"><svg viewBox="0 0 32 32">…</svg></button>
+</div>
+```
+
+`.icon-button` fills its 40px cell as Carbon's ghost icon button does, with a 16px icon. Its icon is Carbon's secondary icon colour at rest, and the primary one with Carbon's hover background under the pointer; Carbon's own button shows the primary colour at rest. Disabled, it takes `--cds-icon-disabled`. `.logo` holds the app's icon in Carbon's interactive colour. `.title` is bold. Use icons from [Carbon's icon library](https://carbondesignsystem.com/elements/icons/library/) (Apache 2.0), inline, each a `<svg viewBox="0 0 32 32">` with its path; Shell gives it its size and colour.
 
 ## The layouts
 
@@ -55,7 +71,7 @@ Shell reads two of your page's tokens, and uses its own value where you set none
 | Property | Without yours | |
 |---|---|---|
 | `--base-space` | `40px` | The row height, an icon cell, and the inset |
-| `--base-border` | `solid 1px #eaeaea` | Under a head, over a foot, between columns |
+| `--base-border` | `solid 1px` in Shell's edge colour | Around the shell, between columns, under a head, over a foot |
 
 It declares three widths of its own. Set yours in `:root`, unlayered or in a layer after `shell`:
 
@@ -66,6 +82,26 @@ It declares three widths of its own. Set yours in `:root`, unlayered or in a lay
 | `--shell-side-more-width` | `clamp(450px, 33%, 800px)` | Side and more, when both show |
 
 Side on its own takes half the width that the menu leaves, up to 864px.
+
+### Colours and type
+
+Every colour is a Carbon token. Where the page has Carbon's own tokens, such as inside a Carbon theme zone, Shell uses them; elsewhere it uses Carbon's values, from theme g10 in light and g100 in dark. Dark follows the page's `color-scheme`, so a page that offers both sets `:root { color-scheme: light dark; }`.
+
+| Shell's colour | Carbon token | g10 | g100 |
+|---|---|---|---|
+| Background | `--cds-background` | `#f4f4f4` | `#161616` |
+| Text | `--cds-text-primary` | `#161616` | `#f4f4f4` |
+| Neck and foot text | `--cds-text-secondary` | `#525252` | `#c6c6c6` |
+| Icon | `--cds-icon-secondary`, `--cds-icon-primary` under the pointer, `--cds-icon-disabled` disabled | `#525252`, `#161616`, 25% of `#161616` | `#c6c6c6`, `#f4f4f4`, 25% of `#f4f4f4` |
+| Icon button under the pointer | `--cds-background-hover` | 12% of `#8d8d8d` | 16% of `#8d8d8d` |
+| Logo | `--cds-interactive` | `#0f62fe` | `#4589ff` |
+| Focus ring | `--cds-focus` | `#0f62fe` | `#ffffff` |
+| Menu | 80% background, 20% `--cds-layer-01` | `#f6f6f6` | `#191919` |
+| Borders | 70% background, 30% `--cds-border-subtle-00` | `#e6e6e6` | `#212121` |
+
+Shell keeps them as `--shell-background`, `--shell-text`, `--shell-quiet`, `--shell-icon`, `--shell-icon-hover`, `--shell-hover`, `--shell-accent`, `--shell-focus`, `--shell-menu-background` and `--shell-edge` on `#shell`, for the page's own rules to use.
+
+The type is 13px on 1.6, in `"Berkeley Mono Variable", "IBM Plex Mono", monospace` (`--shell-font`). Shell loads no font: the page declares the `@font-face` for the one it has.
 
 ## The JavaScript
 
@@ -156,3 +192,5 @@ bin/check               # both, as Carson runs them before a change lands
 ## Licence
 
 MIT; see `LICENSE`.
+
+The icons in `example.html` are from IBM's Carbon icon library, under the Apache License 2.0.
