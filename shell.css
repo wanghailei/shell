@@ -147,8 +147,8 @@
 		--shell-focus: var(--cds-focus, light-dark(#0f62fe, #ffffff));
 		/* The menu is one shade from main: a fifth of the way to Carbon's first layer. */
 		--shell-menu-background: color-mix(in srgb, var(--shell-background) 80%, var(--cds-layer-01, light-dark(#ffffff, #262626)));
-		/* A border is three tenths of the way from the background to Carbon's subtlest border. */
-		--shell-edge: color-mix(in srgb, var(--shell-background) 70%, var(--cds-border-subtle-00, light-dark(#c6c6c6, #393939)));
+		/* A border is a fifth of the way from the background to Carbon's subtlest border. */
+		--shell-edge: color-mix(in srgb, var(--shell-background) 80%, var(--cds-border-subtle-00, light-dark(#c6c6c6, #393939)));
 		--shell-font: "Berkeley Mono Variable", "IBM Plex Mono", monospace;
 
 		background: var(--shell-background);

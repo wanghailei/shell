@@ -97,7 +97,7 @@ Every colour is a Carbon token. Where the page has Carbon's own tokens, such as 
 | Logo | `--cds-interactive` | `#0f62fe` | `#4589ff` |
 | Focus ring | `--cds-focus` | `#0f62fe` | `#ffffff` |
 | Menu | 80% background, 20% `--cds-layer-01` | `#f6f6f6` | `#191919` |
-| Borders | 70% background, 30% `--cds-border-subtle-00` | `#e6e6e6` | `#212121` |
+| Borders | 80% background, 20% `--cds-border-subtle-00` | `#ebebeb` | `#1d1d1d` |
 
 Shell keeps them as `--shell-background`, `--shell-text`, `--shell-quiet`, `--shell-icon`, `--shell-icon-hover`, `--shell-hover`, `--shell-accent`, `--shell-focus`, `--shell-menu-background` and `--shell-edge` on `#shell`, for the page's own rules to use.
 

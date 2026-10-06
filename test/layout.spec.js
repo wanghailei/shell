@@ -203,8 +203,8 @@ for( const [ scheme, carbon ] of Object.entries( CARBON ) ) {
 		expect( menu ).toBeLessThanOrEqual( 3 )
 		for( const [ selector, property ] of [ [ "#shell", "borderTopColor" ], [ "#menu", "borderRightColor" ], [ "#main .head", "borderBottomColor" ] ] ) {
 			const border = apart( await colour( page, selector, property ), background )
-			expect( border, `${ selector } ${ property }` ).toBeGreaterThanOrEqual( 8 )
-			expect( border, `${ selector } ${ property }` ).toBeLessThanOrEqual( 16 )
+			expect( border, `${ selector } ${ property }` ).toBeGreaterThanOrEqual( 5 )
+			expect( border, `${ selector } ${ property }` ).toBeLessThanOrEqual( 10 )
 		}
 	} )
 }
